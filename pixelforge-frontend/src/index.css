@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cyber-bg: #050b14;
+  --color-cyber-surface: #0a1120;
+  --color-cyber-cyan: #00f0ff;
+  --color-cyber-purple: #8a2be2;
+  --color-cyber-pink: #ff003c;
+  --color-cyber-green: #00ff66;
+  --color-cyber-text: #f0f8ff;
+  --color-cyber-muted: #8b9bb4;
+  --color-cyber-border: rgba(255, 255, 255, 0.1);
+  --color-glass-bg: rgba(10, 17, 32, 0.4);
+  --color-glass-border: rgba(255, 255, 255, 0.05);
+
+  --font-sans: 'Inter', 'Roboto', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+body {
+  @apply bg-cyber-bg text-cyber-text font-sans min-h-screen m-0 p-0 overflow-x-hidden relative;
+  background-image:
+    radial-gradient(circle at 15% 50%, rgba(0, 240, 255, 0.15), transparent 25%),
+    radial-gradient(circle at 85% 30%, rgba(138, 43, 226, 0.15), transparent 25%);
+}
+
+/* Glassmorphism utilities */
+.glass {
+  @apply bg-glass-bg backdrop-blur-xl border border-glass-border rounded-2xl;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+.glass-panel {
+  @apply bg-white/[0.02] backdrop-blur-2xl border border-white/[0.05] shadow-2xl rounded-2xl;
+}
+
+.glass-button {
+  @apply relative overflow-hidden bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.05] rounded-xl transition-all duration-300 backdrop-blur-md;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-white/10 rounded-full hover:bg-white/20 transition-colors;
+}
+
+/* Background floating orbs for glassmorphism effect */
+.orb-1 {
+  position: absolute;
+  top: -10%;
+  left: -10%;
+  width: 50vw;
+  height: 50vw;
+  background: radial-gradient(circle, rgba(0, 240, 255, 0.08) 0%, rgba(0, 0, 0, 0) 70%);
+  border-radius: 50%;
+  z-index: -1;
+  animation: float 20s infinite ease-in-out alternate;
+}
+
+.orb-2 {
+  position: absolute;
+  bottom: -10%;
+  right: -5%;
+  width: 60vw;
+  height: 60vw;
+  background: radial-gradient(circle, rgba(138, 43, 226, 0.08) 0%, rgba(0, 0, 0, 0) 70%);
+  border-radius: 50%;
+  z-index: -1;
+  animation: float 25s infinite ease-in-out alternate-reverse;
+}
+
+@keyframes float {
+  0% {
+    transform: translate(0, 0);
+  }
+
+  100% {
+    transform: translate(50px, 50px);
+  }
+}
