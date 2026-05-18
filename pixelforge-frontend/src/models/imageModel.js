@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
 export const useImageModel = create((set, get) => ({
+  baseOriginalImage: null,
   originalImage: null,
   currentImage: null,
   isProcessing: false,
@@ -14,6 +15,7 @@ export const useImageModel = create((set, get) => ({
   },
   
   setInitialImage: (base64) => set({
+    baseOriginalImage: base64,
     originalImage: base64,
     currentImage: base64,
     history: [base64],
