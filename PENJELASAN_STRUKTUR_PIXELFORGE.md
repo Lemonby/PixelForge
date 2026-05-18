@@ -113,7 +113,6 @@ Frontend (React) ←→ HTTP/API ←→ Backend (Flask/Python)
 **Fungsi**: Styling spesifik untuk komponen App (legacy styling)
 
 **Catatan**: File ini sebagian besar digantikan oleh Tailwind CSS dalam implementasi modern
-
 ---
 
 ## 3. Entry Point Files

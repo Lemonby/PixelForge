@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import EditorPage from "./views/pages/EditorPage";
 import HomePage from "./views/pages/HomePage";
 
+// Main application component that sets up routing for the app
 function App() {
   return (
     <Router>

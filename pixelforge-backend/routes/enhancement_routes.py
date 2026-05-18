@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from services.enhancement import adjust_brightness, adjust_contrast, histogram_equalization, sharpen, smooth
+from services.enhancement import adjust_brightness, adjust_contrast, histogram_equalization, sharpen, smooth, apply_adjustments
 
 enhancement_bp = Blueprint('enhancement', __name__)
 
@@ -13,6 +13,12 @@ def brightness_route():
 def contrast_route():
     data = request.json
     res = adjust_contrast(data['image'], int(data.get('value', 0)))
+    return jsonify({'status': 'ok', 'result_image': res})
+
+@enhancement_bp.route('/apply-adjustments', methods=['POST'])
+def apply_adjustments_route():
+    data = request.json
+    res = apply_adjustments(data['image'], data.get('adjustments', {}))
     return jsonify({'status': 'ok', 'result_image': res})
 
 @enhancement_bp.route('/histogram-eq', methods=['POST'])

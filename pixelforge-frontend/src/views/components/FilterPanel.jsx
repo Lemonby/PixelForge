@@ -4,7 +4,7 @@ import { Sparkles, Move, RotateCw, Image as ImageIcon } from "lucide-react";
 import { useEditorController } from "../../controllers/editorController";
 
 const FilterPanel = () => {
-  const { currentImage, isProcessing, applyProcess } = useEditorController();
+  const { currentImage, isProcessing, applyProcess, applyAdjustment, currentAdjustments } = useEditorController();
 
   if (!currentImage) {
     return (
@@ -29,12 +29,20 @@ const FilterPanel = () => {
           </div>
           
           <SliderControl
-            label="Brightness" min={-100} max={100} step={1} defaultValue={0}
-            onChange={(val) => applyProcess("/api/enhancement/brightness", { value: val })}
+            label="Brightness"
+            min={-100}
+            max={100}
+            step={1}
+            defaultValue={currentAdjustments.brightness}
+            onChange={(val) => applyAdjustment("brightness", val)}
           />
           <SliderControl
-            label="Contrast" min={-100} max={100} step={1} defaultValue={0}
-            onChange={(val) => applyProcess("/api/enhancement/contrast", { value: val })}
+            label="Contrast"
+            min={-100}
+            max={100}
+            step={1}
+            defaultValue={currentAdjustments.contrast}
+            onChange={(val) => applyAdjustment("contrast", val)}
           />
           
           <div className="grid grid-cols-2 gap-3 mt-6">

@@ -16,6 +16,28 @@ def adjust_contrast(image_b64: str, value: int) -> str:
     img = cv2.addWeighted(img, alpha_c, img, 0, gamma_c)
     return encode_base64(img)
 
+def apply_adjustments(image_b64: str, adjustments: dict) -> str:
+    """
+    Apply multiple adjustments (brightness, contrast, etc.) to an image.
+    adjustments: dict with keys like 'brightness', 'contrast' and their values
+    """
+    img = decode_base64(image_b64)
+    
+    # Apply brightness if specified
+    if 'brightness' in adjustments and adjustments['brightness'] != 0:
+        img = img.astype(np.float32)
+        img = np.clip(img + adjustments['brightness'], 0, 255).astype(np.uint8)
+    
+    # Apply contrast if specified
+    if 'contrast' in adjustments and adjustments['contrast'] != 0:
+        contrast_val = adjustments['contrast']
+        f = 131 * (contrast_val + 127) / (127 * (131 - contrast_val))
+        alpha_c = f
+        gamma_c = 127 * (1 - f)
+        img = cv2.addWeighted(img, alpha_c, img, 0, gamma_c)
+    
+    return encode_base64(img)
+
 def histogram_equalization(image_b64: str) -> str:
     img = decode_base64(image_b64)
     if len(img.shape) == 3:
