@@ -1,5 +1,6 @@
 import { useImageModel } from "../models/imageModel";
 import api from "../services/api";
+import { histogramService } from "../services/histogramService";
 
 export const useEditorController = () => {
   const model = useImageModel();
@@ -10,6 +11,8 @@ export const useEditorController = () => {
       reader.onload = (event) => {
         const base64 = event.target.result.split(",")[1];
         model.setInitialImage(base64);
+        // Fetch histogram data for uploaded image
+        fetchHistogramData(base64);
       };
       reader.readAsDataURL(file);
     }
@@ -47,6 +50,7 @@ export const useEditorController = () => {
       
       if (allZero) {
         model.setAdjustedImage(model.originalImage);
+        await fetchHistogramData(model.originalImage);
         return;
       }
     }
@@ -66,6 +70,8 @@ export const useEditorController = () => {
       
       if (res.data.status === "ok") {
         model.setAdjustedImage(res.data.result_image);
+        // Fetch histogram data untuk adjusted image
+        await fetchHistogramData(res.data.result_image);
       }
     } catch (err) {
       console.error(err);
@@ -86,6 +92,8 @@ export const useEditorController = () => {
         model.setResultImage(res.data.result_image);
         model.updateAdjustment('brightness', 0);
         model.updateAdjustment('contrast', 0);
+        // Fetch histogram data untuk image yang sudah di-process
+        await fetchHistogramData(res.data.result_image);
       }
     } catch (err) {
       console.error(err);
@@ -95,11 +103,26 @@ export const useEditorController = () => {
     }
   };
 
+  // Fetch histogram data dari backend
+  const fetchHistogramData = async (imageBase64) => {
+    try {
+      const response = await histogramService.getCombinedHistogram(imageBase64);
+      if (response.status === "ok") {
+        const { data } = response;
+        model.setHistogramData(data.rgb_histogram, data.statistics);
+      }
+    } catch (err) {
+      console.error("Error fetching histogram data:", err);
+      // Silent fail untuk histogram - tidak perlu interrupt user experience
+    }
+  };
+
   return {
     ...model,
     handleFileUpload,
     handleDownload,
     applyProcess,
     applyAdjustment,
+    fetchHistogramData,
   };
 };

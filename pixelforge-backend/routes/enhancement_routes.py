@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from services.enhancement import adjust_brightness, adjust_contrast, histogram_equalization, sharpen, smooth, apply_adjustments
+from services.hist import calculate_histogram, calculate_grayscale_histogram, get_image_statistics, get_combined_histogram_data
 
 enhancement_bp = Blueprint('enhancement', __name__)
 
@@ -38,3 +39,39 @@ def smooth_route():
     data = request.json
     res = smooth(data['image'], int(data.get('level', 1)))
     return jsonify({'status': 'ok', 'result_image': res})
+
+@enhancement_bp.route('/histogram', methods=['POST'])
+def histogram_route():
+    """Get RGB histogram data"""
+    data = request.json
+    histogram_data = calculate_histogram(data['image'])
+    if histogram_data is None:
+        return jsonify({'status': 'error', 'message': 'Invalid image'}), 400
+    return jsonify({'status': 'ok', 'histogram': histogram_data})
+
+@enhancement_bp.route('/histogram-gray', methods=['POST'])
+def histogram_gray_route():
+    """Get grayscale histogram data"""
+    data = request.json
+    histogram_data = calculate_grayscale_histogram(data['image'])
+    if histogram_data is None:
+        return jsonify({'status': 'error', 'message': 'Invalid image'}), 400
+    return jsonify({'status': 'ok', 'histogram': histogram_data})
+
+@enhancement_bp.route('/histogram-combined', methods=['POST'])
+def histogram_combined_route():
+    """Get combined histogram data (RGB + Grayscale) and statistics"""
+    data = request.json
+    combined_data = get_combined_histogram_data(data['image'])
+    if combined_data is None:
+        return jsonify({'status': 'error', 'message': 'Invalid image'}), 400
+    return jsonify({'status': 'ok', 'data': combined_data})
+
+@enhancement_bp.route('/image-stats', methods=['POST'])
+def image_stats_route():
+    """Get image statistics"""
+    data = request.json
+    stats = get_image_statistics(data['image'])
+    if stats is None:
+        return jsonify({'status': 'error', 'message': 'Invalid image'}), 400
+    return jsonify({'status': 'ok', 'statistics': stats})

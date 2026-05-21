@@ -8,6 +8,10 @@ export const useImageModel = create((set, get) => ({
   history: [],
   historyIndex: -1,
   
+  // Histogram and statistics data
+  histogram: null,
+  statistics: null,
+  
   // Adjustments yang belum disimpan (temporary)
   currentAdjustments: {
     brightness: 0,
@@ -24,6 +28,11 @@ export const useImageModel = create((set, get) => ({
       brightness: 0,
       contrast: 0,
     },
+  }),
+  
+  setHistogramData: (histogram, statistics) => set({
+    histogram,
+    statistics,
   }),
   
   // Update adjustment value (brightness, contrast, dll)
