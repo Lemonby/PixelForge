@@ -13,32 +13,48 @@
   --color-glass-bg: rgba(10, 17, 32, 0.4);
   --color-glass-border: rgba(255, 255, 255, 0.05);
 
-  --font-sans: 'Inter', 'Roboto', sans-serif;
+  --font-sans: 'Inter', 'Roboto', 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Photoshop theme variables */
+  --color-ps-bg: #181818;
+  --color-ps-panel: #2b2b2b;
+  --color-ps-header: #3c3c3c;
+  --color-ps-border: #1a1a1a;
+  --color-ps-border-light: #3e3e3e;
+  --color-ps-accent: #007acc;
+  --color-ps-accent-hover: #1f94e6;
+  --color-ps-text: #b5b5b5;
+  --color-ps-text-bright: #ffffff;
+  --color-ps-text-muted: #6e6e6e;
 }
 
 body {
-  @apply bg-cyber-bg text-cyber-text font-sans min-h-screen m-0 p-0 overflow-x-hidden relative;
-  background-image:
-    radial-gradient(circle at 15% 50%, rgba(0, 240, 255, 0.15), transparent 25%),
-    radial-gradient(circle at 85% 30%, rgba(138, 43, 226, 0.15), transparent 25%);
+  @apply bg-ps-bg text-ps-text font-sans min-h-screen m-0 p-0 overflow-hidden select-none;
 }
 
-/* Glassmorphism utilities */
-.glass {
-  @apply bg-glass-bg backdrop-blur-xl border border-glass-border rounded-2xl;
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+/* Photoshop Custom Scrollbars */
+.ps-scrollbar::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
 }
 
-.glass-panel {
-  @apply bg-white/[0.02] backdrop-blur-2xl border border-white/[0.05] shadow-2xl rounded-2xl;
+.ps-scrollbar::-webkit-scrollbar-track {
+  background: #1e1e1e;
+  border: 1px solid #1a1a1a;
 }
 
-.glass-button {
-  @apply relative overflow-hidden bg-white/[0.03] hover:bg-white/[0.08] border border-white/[0.05] rounded-xl transition-all duration-300 backdrop-blur-md;
+.ps-scrollbar::-webkit-scrollbar-thumb {
+  background: #3e3e3e;
+  border: 2px solid #1e1e1e;
+  border-radius: 2px;
 }
 
-/* Scrollbar */
+.ps-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #555555;
+}
+
+/* Custom layout scrollbars for panels */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -49,40 +65,75 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-white/10 rounded-full hover:bg-white/20 transition-colors;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
 }
 
-/* Background floating orbs for glassmorphism effect */
-.orb-1 {
-  position: absolute;
-  top: -10%;
-  left: -10%;
-  width: 50vw;
-  height: 50vw;
-  background: radial-gradient(circle, rgba(0, 240, 255, 0.08) 0%, rgba(0, 0, 0, 0) 70%);
-  border-radius: 50%;
-  z-index: -1;
-  animation: float 20s infinite ease-in-out alternate;
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
 }
 
-.orb-2 {
-  position: absolute;
-  bottom: -10%;
-  right: -5%;
-  width: 60vw;
-  height: 60vw;
-  background: radial-gradient(circle, rgba(138, 43, 226, 0.08) 0%, rgba(0, 0, 0, 0) 70%);
-  border-radius: 50%;
-  z-index: -1;
-  animation: float 25s infinite ease-in-out alternate-reverse;
+/* Photoshop Rulers Styling */
+.ruler-container {
+  position: relative;
+  background-color: #2b2b2b;
 }
 
-@keyframes float {
-  0% {
-    transform: translate(0, 0);
-  }
+.ruler-x {
+  height: 18px;
+  background-color: #2b2b2b;
+  border-bottom: 1px solid #1a1a1a;
+  position: relative;
+  background-image: 
+    repeating-linear-gradient(90deg, #444 0px, #444 1px, transparent 1px, transparent 10px),
+    repeating-linear-gradient(90deg, #777 0px, #777 1px, transparent 1px, transparent 50px);
+  background-size: 100% 6px, 100% 12px;
+  background-repeat: repeat-x;
+  background-position: bottom left;
+}
 
-  100% {
-    transform: translate(50px, 50px);
-  }
+.ruler-y {
+  width: 18px;
+  background-color: #2b2b2b;
+  border-right: 1px solid #1a1a1a;
+  position: relative;
+  background-image: 
+    repeating-linear-gradient(180deg, #444 0px, #444 1px, transparent 1px, transparent 10px),
+    repeating-linear-gradient(180deg, #777 0px, #777 1px, transparent 1px, transparent 50px);
+  background-size: 6px 100%, 12px 100%;
+  background-repeat: repeat-y;
+  background-position: top right;
+}
+
+/* Checkerboard workspace background for Canvas transparent image indications */
+.ps-canvas-bg {
+  background-color: #1e1e1e;
+  background-image: 
+    linear-gradient(45deg, #1b1b1b 25%, transparent 25%), 
+    linear-gradient(-45deg, #1b1b1b 25%, transparent 25%), 
+    linear-gradient(45deg, transparent 75%, #1b1b1b 75%), 
+    linear-gradient(-45deg, transparent 75%, #1b1b1b 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+}
+
+/* Photoshop styled panels */
+.ps-panel {
+  @apply bg-ps-panel border border-ps-border shadow-md text-xs;
+}
+
+.ps-panel-header {
+  @apply bg-ps-header text-ps-text-bright font-bold px-3 py-1.5 border-b border-ps-border select-none flex items-center justify-between uppercase tracking-wider text-[10px];
+}
+
+.ps-button {
+  @apply bg-[#3c3c3c] hover:bg-[#4a4a4a] active:bg-[#1a1a1a] text-ps-text-bright border border-ps-border rounded py-1 px-3 font-medium transition-colors select-none text-[11px] disabled:opacity-30 disabled:pointer-events-none;
+}
+
+.ps-button-primary {
+  @apply bg-[#007acc] hover:bg-[#1f94e6] active:bg-[#005a9e] text-white border border-[#1a1a1a] rounded py-1 px-3 font-semibold transition-colors select-none text-[11px] disabled:opacity-30 disabled:pointer-events-none;
+}
+
+.ps-input {
+  @apply bg-[#1e1e1e] text-ps-text-bright border border-ps-border rounded px-2 py-1 focus:outline-none focus:border-ps-accent font-mono text-[11px];
 }

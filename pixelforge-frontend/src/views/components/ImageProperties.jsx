@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Info } from "lucide-react";
+import { Info, FileText } from "lucide-react";
 
-const ImageProperties = ({ image, baseImage }) => {
+const ImageProperties = ({ image, title = "Properties" }) => {
   const [properties, setProperties] = useState({
     width: 0,
     height: 0,
-    fileSize: 0,
+    fileSize: "0 KB",
     colorSpace: "RGB",
     bitDepth: 24,
+    aspectRatio: "0",
+    pixels: 0,
   });
 
   useEffect(() => {
@@ -15,7 +17,7 @@ const ImageProperties = ({ image, baseImage }) => {
 
     const img = new Image();
     img.onload = () => {
-      // Hitung file size dari base64
+      // Calculate file size from base64
       const binaryString = atob(image);
       const bytes = binaryString.length;
       
@@ -43,70 +45,91 @@ const ImageProperties = ({ image, baseImage }) => {
     img.src = `data:image/png;base64,${image}`;
   }, [image]);
 
+  if (!image) {
+    return (
+      <div className="flex-1 flex flex-col items-center justify-center text-[#8e8e8e] text-center p-6 bg-[#2b2b2b]">
+        <Info size={32} className="opacity-25 mb-3" />
+        <span className="text-[11px] font-medium leading-relaxed max-w-[200px]">
+          No active document to inspect {title.toLowerCase()}
+        </span>
+      </div>
+    );
+  }
+
   return (
-    <div className="glass-panel p-6 h-full flex flex-col">
-      <div className="flex items-center gap-2 mb-4">
-        <Info size={16} className="text-cyber-cyan" />
-        <h3 className="text-sm font-semibold text-white/80 uppercase tracking-wider">
-          Image Properties
-        </h3>
-      </div>
-
-      <div className="space-y-3 text-xs flex-1">
-        {/* Dimensions */}
-        <div className="bg-white/5 rounded-lg p-3 border border-white/10">
-          <div className="text-cyber-muted mb-1">Dimensions</div>
-          <div className="text-white font-semibold">
-            {properties.width} × {properties.height} px
-          </div>
-        </div>
-
-        {/* Aspect Ratio */}
-        <div className="bg-white/5 rounded-lg p-3 border border-white/10">
-          <div className="text-cyber-muted mb-1">Aspect Ratio</div>
-          <div className="text-white font-semibold">
-            {properties.aspectRatio || "N/A"}:1
-          </div>
-        </div>
-
-        {/* Total Pixels */}
-        <div className="bg-white/5 rounded-lg p-3 border border-white/10">
-          <div className="text-cyber-muted mb-1">Total Pixels</div>
-          <div className="text-white font-semibold">
-            {properties.pixels ? properties.pixels.toLocaleString() : "N/A"}
-          </div>
-        </div>
-
-        {/* File Size */}
-        <div className="bg-white/5 rounded-lg p-3 border border-white/10">
-          <div className="text-cyber-muted mb-1">File Size</div>
-          <div className="text-white font-semibold">{properties.fileSize}</div>
-        </div>
-
-        {/* Color Space */}
-        <div className="bg-white/5 rounded-lg p-3 border border-white/10">
-          <div className="text-cyber-muted mb-1">Color Space</div>
-          <div className="text-white font-semibold">{properties.colorSpace}</div>
-        </div>
-
-        {/* Bit Depth */}
-        <div className="bg-white/5 rounded-lg p-3 border border-white/10">
-          <div className="text-cyber-muted mb-1">Bit Depth</div>
-          <div className="text-white font-semibold">{properties.bitDepth}-bit</div>
+    <div className="flex-1 flex flex-col bg-[#2b2b2b] select-none h-full overflow-hidden">
+      {/* Panel Header */}
+      <div className="ps-panel-header shrink-0">
+        <div className="flex items-center gap-1.5">
+          <Info size={12} className="text-[#007acc]" />
+          <span>{title}</span>
         </div>
       </div>
 
-      {/* Visual Indicator */}
-      {/* <div className="mt-6 pt-4 border-t border-white/10">
-        <div className="text-cyber-muted text-xs mb-2">Color Preview</div>
-        <div className="flex gap-1">
-          <div className="h-6 flex-1 rounded bg-red-500/70 shadow-lg shadow-red-500/20"></div>
-          <div className="h-6 flex-1 rounded bg-green-500/70 shadow-lg shadow-green-500/20"></div>
-          <div className="h-6 flex-1 rounded bg-blue-500/70 shadow-lg shadow-blue-500/20"></div>
+      {/* Info List Body */}
+      <div className="flex-1 p-3 flex flex-col gap-3 overflow-y-auto custom-scrollbar">
+        
+        {/* Document Sizing Section */}
+        <div className="border border-[#1a1a1a] rounded bg-[#202020] p-2.5">
+          <div className="flex items-center gap-1.5 mb-2.5 pb-1 border-b border-[#2c2c2c] text-[10px] font-bold text-white uppercase tracking-wider">
+            <FileText size={11} className="text-[#8e8e8e]" />
+            <span>Document Info</span>
+          </div>
+
+          <div className="space-y-1.5 text-[10.5px] text-[#8e8e8e]">
+            <div className="flex justify-between border-b border-[#2c2c2c]/40 pb-1">
+              <span>Dimensions:</span>
+              <span className="text-white font-semibold font-mono">
+                {properties.width} × {properties.height} px
+              </span>
+            </div>
+            
+            <div className="flex justify-between border-b border-[#2c2c2c]/40 pb-1">
+              <span>Aspect Ratio:</span>
+              <span className="text-white font-semibold font-mono">
+                {properties.aspectRatio}:1
+              </span>
+            </div>
+
+            <div className="flex justify-between border-b border-[#2c2c2c]/40 pb-1">
+              <span>Total Pixels:</span>
+              <span className="text-white font-semibold font-mono">
+                {properties.pixels ? properties.pixels.toLocaleString() : "0"}
+              </span>
+            </div>
+
+            <div className="flex justify-between border-b border-[#2c2c2c]/40 pb-1">
+              <span>File Size:</span>
+              <span className="text-white font-semibold font-mono">
+                {properties.fileSize}
+              </span>
+            </div>
+
+            <div className="flex justify-between border-b border-[#2c2c2c]/40 pb-1">
+              <span>Color Space:</span>
+              <span className="text-white font-semibold font-mono">
+                {properties.colorSpace}
+              </span>
+            </div>
+
+            <div className="flex justify-between">
+              <span>Bit Depth:</span>
+              <span className="text-white font-semibold font-mono">
+                {properties.bitDepth}-bit (8bpc)
+              </span>
+            </div>
+          </div>
         </div>
-      </div> */}
+
+        {/* System Info Note */}
+        <div className="text-[9px] text-[#6e6e6e] leading-normal px-0.5">
+          File attributes are computed client-side upon rendering the decoded Base64 pixel buffer array.
+        </div>
+
+      </div>
     </div>
   );
 };
 
 export default ImageProperties;
+

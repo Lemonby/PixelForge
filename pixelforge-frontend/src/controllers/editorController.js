@@ -5,14 +5,27 @@ import { histogramService } from "../services/histogramService";
 export const useEditorController = () => {
   const model = useImageModel();
 
+  const fetchOriginalHistogramData = async (imageBase64) => {
+    try {
+      const response = await histogramService.getCombinedHistogram(imageBase64);
+      if (response.status === "ok") {
+        const { data } = response;
+        model.setOriginalHistogramData(data.rgb_histogram, data.statistics);
+        model.setHistogramData(data.rgb_histogram, data.statistics);
+      }
+    } catch (err) {
+      console.error("Error fetching original histogram data:", err);
+    }
+  };
+
   const handleFileUpload = (file) => {
     if (file) {
       const reader = new FileReader();
       reader.onload = (event) => {
         const base64 = event.target.result.split(",")[1];
         model.setInitialImage(base64);
-        // Fetch histogram data for uploaded image
-        fetchHistogramData(base64);
+        // Fetch original and active histogram data for uploaded image
+        fetchOriginalHistogramData(base64);
       };
       reader.readAsDataURL(file);
     }
