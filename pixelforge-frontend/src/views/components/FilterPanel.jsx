@@ -11,7 +11,9 @@ import {
   Shield,
   Crop as CropIcon,
   Maximize,
-  ArrowRight
+  ArrowRight,
+  Binary,
+  Palette
 } from "lucide-react";
 import { useEditorController } from "../../controllers/editorController";
 
@@ -20,6 +22,8 @@ const FilterPanel = () => {
   const [isEnhanceOpen, setIsEnhanceOpen] = useState(true);
   const [isTransformOpen, setIsTransformOpen] = useState(true);
   const [isRestorationOpen, setIsRestorationOpen] = useState(true);
+  const [isEdgeOpen, setIsEdgeOpen] = useState(true);
+  const [isColorOpen, setIsColorOpen] = useState(true);
 
   // Geometric state variables
   const [interpolation, setInterpolation] = useState("bilinear");
@@ -39,6 +43,24 @@ const FilterPanel = () => {
   const [gaussianKernel, setGaussianKernel] = useState(5);
   const [medianKernel, setMedianKernel] = useState(5);
   const [noiseRemovalKernel, setNoiseRemovalKernel] = useState(5);
+
+  // Binary & Edge Processing state variables
+  const [edgeCategory, setEdgeCategory] = useState("threshold");
+  const [thresholdVal, setThresholdVal] = useState(127);
+  const [edgeMethod, setEdgeMethod] = useState("canny");
+  const [cannyLow, setCannyLow] = useState(50);
+  const [cannyHigh, setCannyHigh] = useState(150);
+  const [morphOp, setMorphOp] = useState("erode");
+  const [morphShape, setMorphShape] = useState("rectangle");
+  const [morphSize, setMorphSize] = useState(3);
+
+  // Color Processing state variables
+  const [colorCategory, setColorCategory] = useState("grayscale");
+  const [grayMethod, setGrayMethod] = useState("luminosity_601");
+  const [splitChannel, setSplitChannel] = useState("r");
+  const [splitRep, setSplitRep] = useState("grayscale");
+  const [hueVal, setHueVal] = useState(0);
+  const [satVal, setSatVal] = useState(0);
 
   // Keep track of active image properties to pre-populate dimensions
   useEffect(() => {
@@ -449,6 +471,361 @@ const FilterPanel = () => {
                   </button>
                 </div>
               </div>
+
+            </div>
+          )}
+        </div>
+
+        {/* Section 4: Binary & Edge Processing */}
+        <div className="border border-[#1a1a1a] rounded bg-[#202020]">
+          <button 
+            onClick={() => setIsEdgeOpen(!isEdgeOpen)}
+            className="w-full flex items-center justify-between px-2.5 py-1.5 bg-[#2c2c2c] hover:bg-[#323232] border-b border-[#1a1a1a] text-[10px] font-bold uppercase tracking-wider text-[#cccccc]"
+          >
+            <div className="flex items-center gap-1.5">
+              <Binary size={11} className="text-[#007acc]" />
+              <span>Binary & Edge Processing</span>
+            </div>
+            {isEdgeOpen ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
+          </button>
+
+          {isEdgeOpen && (
+            <div className="p-3 space-y-4">
+              
+              {/* Category Selector (Master Dropdown) */}
+              <div className="flex items-center justify-between border-b border-[#2c2c2c] pb-2.5 text-[10px]">
+                <span className="text-[#8e8e8e] font-semibold uppercase">Category:</span>
+                <select
+                  value={edgeCategory}
+                  onChange={(e) => setEdgeCategory(e.target.value)}
+                  className="ps-input py-0.5 bg-[#1b1b1b] text-white text-[10px] border border-[#1a1a1a] rounded focus:border-[#007acc] outline-none font-bold"
+                >
+                  <option value="threshold">Binary Thresholding</option>
+                  <option value="edge">Edge Detection</option>
+                  <option value="morphology">Mathematical Morphology</option>
+                </select>
+              </div>
+
+              {/* Contextual Options */}
+              
+              {/* 1. Thresholding Category */}
+              {edgeCategory === "threshold" && (
+                <div className="space-y-4">
+                  <p className="text-[9px] text-[#8e8e8e] leading-relaxed">
+                    Converts the image to a binary (black-and-white) representation using a threshold limit.
+                  </p>
+                  
+                  <SliderControl
+                    label="Threshold Limit"
+                    min={0}
+                    max={255}
+                    step={1}
+                    defaultValue={thresholdVal}
+                    onChange={(val) => {
+                      setThresholdVal(val);
+                      applyProcess("/api/edge/threshold", { threshold: val });
+                    }}
+                  />
+                  
+                  <button
+                    onClick={() => applyProcess("/api/edge/threshold", { threshold: thresholdVal })}
+                    className="ps-button-primary w-full py-1 text-[10px]"
+                  >
+                    Apply Thresholding
+                  </button>
+                </div>
+              )}
+
+              {/* 2. Edge Detection Category */}
+              {edgeCategory === "edge" && (
+                <div className="space-y-4">
+                  <p className="text-[9px] text-[#8e8e8e] leading-relaxed">
+                    Extracts high-frequency boundary lines using mathematical convolution gradients.
+                  </p>
+
+                  <div className="flex items-center justify-between border-b border-[#2c2c2c]/40 pb-2 text-[10px]">
+                    <span className="text-[#8e8e8e]">Method:</span>
+                    <select
+                      value={edgeMethod}
+                      onChange={(e) => {
+                        const method = e.target.value;
+                        setEdgeMethod(method);
+                        applyProcess("/api/edge/detect", { method, low: cannyLow, high: cannyHigh });
+                      }}
+                      className="ps-input py-0.5 bg-[#1b1b1b] text-white text-[10px] border border-[#1a1a1a] rounded focus:border-[#007acc] outline-none font-semibold"
+                    >
+                      <option value="canny">Canny Filter</option>
+                      <option value="sobel">Sobel Operator</option>
+                      <option value="prewitt">Prewitt Filter</option>
+                      <option value="robert">Roberts Cross</option>
+                      <option value="laplacian">Laplacian Gradient</option>
+                      <option value="log">Laplacian of Gaussian (LoG)</option>
+                    </select>
+                  </div>
+
+                  {/* Canny specific sliders */}
+                  {edgeMethod === "canny" && (
+                    <div className="space-y-3 bg-[#1e1e1e] border border-[#1a1a1a] p-2 rounded">
+                      <span className="text-[9px] text-white font-semibold uppercase tracking-wider block border-b border-[#2c2c2c] pb-1 mb-1">
+                        Canny Sensitivity Limits
+                      </span>
+                      
+                      <SliderControl
+                        label="Low Threshold"
+                        min={0}
+                        max={255}
+                        step={1}
+                        defaultValue={cannyLow}
+                        onChange={(val) => {
+                          setCannyLow(val);
+                          applyProcess("/api/edge/detect", { method: "canny", low: val, high: cannyHigh });
+                        }}
+                      />
+
+                      <SliderControl
+                        label="High Threshold"
+                        min={0}
+                        max={255}
+                        step={1}
+                        defaultValue={cannyHigh}
+                        onChange={(val) => {
+                          setCannyHigh(val);
+                          applyProcess("/api/edge/detect", { method: "canny", low: cannyLow, high: val });
+                        }}
+                      />
+                    </div>
+                  )}
+
+                  <button
+                    onClick={() => applyProcess("/api/edge/detect", { method: edgeMethod, low: cannyLow, high: cannyHigh })}
+                    className="ps-button-primary w-full py-1 text-[10px]"
+                  >
+                    Apply Edge Detection
+                  </button>
+                </div>
+              )}
+
+              {/* 3. Mathematical Morphology Category */}
+              {edgeCategory === "morphology" && (
+                <div className="space-y-3">
+                  <p className="text-[9px] text-[#8e8e8e] leading-relaxed">
+                    Erodes or dilates shape boundaries using structuring element kernels.
+                  </p>
+
+                  <div className="flex items-center justify-between border-b border-[#2c2c2c]/40 pb-2 text-[10px]">
+                    <span className="text-[#8e8e8e]">Operation:</span>
+                    <select
+                      value={morphOp}
+                      onChange={(e) => {
+                        const op = e.target.value;
+                        setMorphOp(op);
+                        applyProcess("/api/edge/morphology", { op, shape: morphShape, kernel_size: morphSize });
+                      }}
+                      className="ps-input py-0.5 bg-[#1b1b1b] text-white text-[10px] border border-[#1a1a1a] rounded focus:border-[#007acc] outline-none font-semibold"
+                    >
+                      <option value="erode">Erosion (Kikis)</option>
+                      <option value="dilate">Dilation (Pelebaran)</option>
+                    </select>
+                  </div>
+
+                  <div className="flex items-center justify-between border-b border-[#2c2c2c]/40 pb-2 text-[10px]">
+                    <span className="text-[#8e8e8e]">Kernel Shape:</span>
+                    <select
+                      value={morphShape}
+                      onChange={(e) => {
+                        const shape = e.target.value;
+                        setMorphShape(shape);
+                        applyProcess("/api/edge/morphology", { op: morphOp, shape, kernel_size: morphSize });
+                      }}
+                      className="ps-input py-0.5 bg-[#1b1b1b] text-white text-[10px] border border-[#1a1a1a] rounded focus:border-[#007acc] outline-none font-semibold"
+                    >
+                      <option value="rectangle">Rectangle (Kotak)</option>
+                      <option value="cross">Cross (Salib)</option>
+                      <option value="ellipse">Ellipse (Elips)</option>
+                    </select>
+                  </div>
+
+                  <div className="bg-[#1e1e1e] border border-[#1a1a1a] p-2.5 rounded">
+                    <SliderControl
+                      label="Kernel Structuring Size"
+                      min={3}
+                      max={15}
+                      step={2}
+                      defaultValue={morphSize}
+                      onChange={(val) => {
+                        setMorphSize(val);
+                        applyProcess("/api/edge/morphology", { op: morphOp, shape: morphShape, kernel_size: val });
+                      }}
+                    />
+                  </div>
+
+                  <button
+                    onClick={() => applyProcess("/api/edge/morphology", { op: morphOp, shape: morphShape, kernel_size: morphSize })}
+                    className="ps-button-primary w-full py-1 text-[10px] mt-1"
+                  >
+                    Apply Morphology
+                  </button>
+                </div>
+              )}
+
+            </div>
+          )}
+        </div>
+
+        {/* Section 5: Color Processing */}
+        <div className="border border-[#1a1a1a] rounded bg-[#202020]">
+          <button 
+            onClick={() => setIsColorOpen(!isColorOpen)}
+            className="w-full flex items-center justify-between px-2.5 py-1.5 bg-[#2c2c2c] hover:bg-[#323232] border-b border-[#1a1a1a] text-[10px] font-bold uppercase tracking-wider text-[#cccccc]"
+          >
+            <div className="flex items-center gap-1.5">
+              <Palette size={11} className="text-[#007acc]" />
+              <span>Color Processing</span>
+            </div>
+            {isColorOpen ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
+          </button>
+
+          {isColorOpen && (
+            <div className="p-3 space-y-4">
+              
+              {/* Category Selector (Master Dropdown) */}
+              <div className="flex items-center justify-between border-b border-[#2c2c2c] pb-2.5 text-[10px]">
+                <span className="text-[#8e8e8e] font-semibold uppercase">Category:</span>
+                <select
+                  value={colorCategory}
+                  onChange={(e) => setColorCategory(e.target.value)}
+                  className="ps-input py-0.5 bg-[#1b1b1b] text-white text-[10px] border border-[#1a1a1a] rounded focus:border-[#007acc] outline-none font-bold"
+                >
+                  <option value="grayscale">Grayscale Conversion</option>
+                  <option value="splitting">Channel Splitting</option>
+                  <option value="adjust">Hue / Saturation</option>
+                </select>
+              </div>
+
+              {/* Contextual Options */}
+              
+              {/* 1. Grayscale Conversion Category */}
+              {colorCategory === "grayscale" && (
+                <div className="space-y-3">
+                  <p className="text-[9px] text-[#8e8e8e] leading-relaxed">
+                    Converts the RGB color image to a single-channel grayscale representation using weighted color luma formulas.
+                  </p>
+                  
+                  <div className="flex items-center justify-between border-b border-[#2c2c2c]/40 pb-2 text-[10px]">
+                    <span className="text-[#8e8e8e]">Weight Model:</span>
+                    <select
+                      value={grayMethod}
+                      onChange={(e) => setGrayMethod(e.target.value)}
+                      className="ps-input py-0.5 bg-[#1b1b1b] text-white text-[10px] border border-[#1a1a1a] rounded focus:border-[#007acc] outline-none font-semibold"
+                    >
+                      <option value="luminosity_601">Luminosity (Standard BT.601)</option>
+                      <option value="luminosity_709">Luminosity (HDTV BT.709)</option>
+                      <option value="average">Average (R+G+B)/3</option>
+                      <option value="desaturation">Desaturation (Min-Max Average)</option>
+                    </select>
+                  </div>
+                  
+                  <button
+                    onClick={() => applyProcess("/api/color/grayscale", { method: grayMethod })}
+                    className="ps-button-primary w-full py-1.5 text-[10px] font-semibold text-center mt-1"
+                  >
+                    Convert to Grayscale
+                  </button>
+                </div>
+              )}
+
+              {/* 2. Channel Splitting Category */}
+              {colorCategory === "splitting" && (
+                <div className="space-y-3">
+                  <p className="text-[9px] text-[#8e8e8e] leading-relaxed">
+                    Extracts and isolates the Red, Green, or Blue channel matrix from the composite BGR structure.
+                  </p>
+
+                  <div className="flex items-center justify-between border-b border-[#2c2c2c]/40 pb-2 text-[10px]">
+                    <span className="text-[#8e8e8e]">Channel:</span>
+                    <select
+                      value={splitChannel}
+                      onChange={(e) => setSplitChannel(e.target.value)}
+                      className="ps-input py-0.5 bg-[#1b1b1b] text-white text-[10px] border border-[#1a1a1a] rounded focus:border-[#007acc] outline-none font-semibold"
+                    >
+                      <option value="r">Red Channel</option>
+                      <option value="g">Green Channel</option>
+                      <option value="b">Blue Channel</option>
+                    </select>
+                  </div>
+
+                  <div className="flex items-center justify-between border-b border-[#2c2c2c]/40 pb-2 text-[10px]">
+                    <span className="text-[#8e8e8e]">Representation:</span>
+                    <select
+                      value={splitRep}
+                      onChange={(e) => setSplitRep(e.target.value)}
+                      className="ps-input py-0.5 bg-[#1b1b1b] text-white text-[10px] border border-[#1a1a1a] rounded focus:border-[#007acc] outline-none font-semibold"
+                    >
+                      <option value="grayscale">Grayscale Intensity</option>
+                      <option value="color">Color Tinted (Isolated)</option>
+                    </select>
+                  </div>
+
+                  <button
+                    onClick={() => applyProcess("/api/color/channel-split", { channel: splitChannel, representation: splitRep })}
+                    className="ps-button-primary w-full py-1.5 text-[10px] font-semibold text-center mt-1"
+                  >
+                    Extract Channel
+                  </button>
+                </div>
+              )}
+
+              {/* 3. HSV Color Adjustments Category */}
+              {colorCategory === "adjust" && (
+                <div className="space-y-4">
+                  <p className="text-[9px] text-[#8e8e8e] leading-relaxed">
+                    Adjusts Hue (H) and Saturation (S) space dimensions using non-linear HSV transformation mapping.
+                  </p>
+
+                  <SliderControl
+                    label="Hue Shift"
+                    min={-180}
+                    max={180}
+                    step={1}
+                    defaultValue={hueVal}
+                    onChange={(val) => {
+                      setHueVal(val);
+                      applyProcess("/api/color/adjust", { hue: val, saturation: satVal });
+                    }}
+                  />
+
+                  <SliderControl
+                    label="Saturation Offset"
+                    min={-100}
+                    max={100}
+                    step={1}
+                    defaultValue={satVal}
+                    onChange={(val) => {
+                      setSatVal(val);
+                      applyProcess("/api/color/adjust", { hue: hueVal, saturation: val });
+                    }}
+                  />
+
+                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[#2c2c2c]">
+                    <button
+                      onClick={() => applyProcess("/api/color/adjust", { hue: hueVal, saturation: satVal })}
+                      className="ps-button-primary py-1 px-3 text-[9.5px] font-semibold"
+                    >
+                      Apply Adjust
+                    </button>
+                    <button
+                      onClick={() => {
+                        setHueVal(0);
+                        setSatVal(0);
+                        applyProcess("/api/color/adjust", { hue: 0, saturation: 0 });
+                      }}
+                      className="ps-button py-1 px-3 text-[9.5px]"
+                    >
+                      Reset Colors
+                    </button>
+                  </div>
+                </div>
+              )}
 
             </div>
           )}
