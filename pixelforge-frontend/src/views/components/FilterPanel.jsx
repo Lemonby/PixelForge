@@ -13,9 +13,13 @@ import {
   Maximize,
   ArrowRight,
   Binary,
-  Palette
+  Palette,
+  Scissors,
+  Download
 } from "lucide-react";
 import { useEditorController } from "../../controllers/editorController";
+import SegmentPanel from "./SegmentPanel";
+import CompressPanel from "./CompressPanel";
 
 const FilterPanel = () => {
   const { currentImage, isProcessing, applyProcess, applyAdjustment, currentAdjustments } = useEditorController();
@@ -24,6 +28,8 @@ const FilterPanel = () => {
   const [isRestorationOpen, setIsRestorationOpen] = useState(true);
   const [isEdgeOpen, setIsEdgeOpen] = useState(true);
   const [isColorOpen, setIsColorOpen] = useState(true);
+  const [isSegmentOpen, setIsSegmentOpen] = useState(false);
+  const [isCompressOpen, setIsCompressOpen] = useState(false);
 
   // Geometric state variables
   const [interpolation, setInterpolation] = useState("bilinear");
@@ -827,6 +833,46 @@ const FilterPanel = () => {
                 </div>
               )}
 
+            </div>
+          )}
+        </div>
+
+        {/* Section 6: Image Segmentation */}
+        <div className="border border-[#1a1a1a] rounded bg-[#202020]">
+          <button 
+            onClick={() => setIsSegmentOpen(!isSegmentOpen)}
+            className="w-full flex items-center justify-between px-2.5 py-1.5 bg-[#2c2c2c] hover:bg-[#323232] border-b border-[#1a1a1a] text-[10px] font-bold uppercase tracking-wider text-[#cccccc]"
+          >
+            <div className="flex items-center gap-1.5">
+              <Scissors size={11} className="text-[#007acc]" />
+              <span>Image Segmentation</span>
+            </div>
+            {isSegmentOpen ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
+          </button>
+
+          {isSegmentOpen && (
+            <div className="p-3 border-t border-[#1a1a1a]">
+              <SegmentPanel />
+            </div>
+          )}
+        </div>
+
+        {/* Section 7: Image Compression */}
+        <div className="border border-[#1a1a1a] rounded bg-[#202020]">
+          <button 
+            onClick={() => setIsCompressOpen(!isCompressOpen)}
+            className="w-full flex items-center justify-between px-2.5 py-1.5 bg-[#2c2c2c] hover:bg-[#323232] border-b border-[#1a1a1a] text-[10px] font-bold uppercase tracking-wider text-[#cccccc]"
+          >
+            <div className="flex items-center gap-1.5">
+              <Download size={11} className="text-[#007acc]" />
+              <span>Image Compression</span>
+            </div>
+            {isCompressOpen ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
+          </button>
+
+          {isCompressOpen && (
+            <div className="p-3 border-t border-[#1a1a1a]">
+              <CompressPanel />
             </div>
           )}
         </div>

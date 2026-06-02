@@ -7,6 +7,8 @@ from routes.transform_routes import transform_bp
 from routes.filter_routes import filter_bp
 from routes.edge_routes import edge_bp
 from routes.color_routes import color_bp
+from routes.segment_routes import segment_bp
+from routes.compress_routes import compress_bp
 
 def create_app():
     app = Flask(__name__)
@@ -19,6 +21,8 @@ def create_app():
     app.register_blueprint(filter_bp, url_prefix='/api/filter')
     app.register_blueprint(edge_bp, url_prefix='/api/edge')
     app.register_blueprint(color_bp, url_prefix='/api/color')
+    app.register_blueprint(segment_bp, url_prefix='/api/segment')
+    app.register_blueprint(compress_bp, url_prefix='/api/compress')
 
     @app.route('/')
     def index():

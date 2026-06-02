@@ -56,13 +56,45 @@ const TopBar = () => {
       {/* Row 1: Application Menu Bar */}
       <div className="h-8 flex items-center justify-between px-3 border-b border-[#1a1a1a] relative">
         <div className="flex items-center gap-1.5 h-full">
-          {/* Photoshop "Ps" App Logo Icon */}
+          {/* Unify Studio logo with Landing Page */}
           <div 
             onClick={() => navigate("/")}
-            className="w-5 h-5 bg-[#001d3d] border border-[#005a9e] rounded text-[11px] font-black text-[#00a8ff] flex items-center justify-center cursor-pointer hover:bg-[#002b5c] transition-colors mr-2 shadow"
-            title="PixelForge Home"
+            className="flex items-center gap-2 cursor-pointer group/logo mr-3 select-none"
+            title="Return to PixelForge Home"
           >
-            Ps
+            <div className="relative flex items-center justify-center w-6 h-6 rounded border border-white/10 bg-white/5 backdrop-blur-md shadow-[0_0_10px_rgba(0,240,255,0.15)] group-hover/logo:shadow-[0_0_15px_rgba(138,43,226,0.4)] group-hover/logo:scale-105 transition-all duration-300">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="topFaceLogoStudio" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stopColor="#00f0ff" />
+                    <stop offset="100%" stopColor="#0080ff" />
+                  </linearGradient>
+                  <linearGradient id="leftFaceLogoStudio" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#8a2be2" />
+                    <stop offset="100%" stopColor="#4a00e0" />
+                  </linearGradient>
+                  <linearGradient id="rightFaceLogoStudio" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#ff003c" />
+                    <stop offset="100%" stopColor="#8a2be2" />
+                  </linearGradient>
+                </defs>
+                <path d="M12 3L22 8L12 13L2 8L12 3Z" fill="url(#topFaceLogoStudio)" opacity="0.95" />
+                <path d="M2 8V16L12 21V13L2 8Z" fill="url(#leftFaceLogoStudio)" opacity="0.95" />
+                <path d="M22 8V16L12 21V13L22 8Z" fill="url(#rightFaceLogoStudio)" opacity="0.95" />
+                <path d="M12 3L22 8L12 13L2 8L12 3Z" stroke="#ffffff" strokeWidth="0.5" strokeOpacity="0.8" />
+                <path d="M12 13V21" stroke="#ffffff" strokeWidth="0.5" strokeOpacity="0.6" />
+                <path d="M2 8L12 13" stroke="#ffffff" strokeWidth="0.5" strokeOpacity="0.6" />
+                <path d="M22 8L12 13" stroke="#ffffff" strokeWidth="0.5" strokeOpacity="0.6" />
+              </svg>
+            </div>
+            <div className="flex flex-col justify-center">
+              <span className="text-[10px] font-black tracking-widest text-white leading-none">
+                PIXEL<span className="text-[#00f0ff]">FORGE</span>
+              </span>
+              <span className="text-[7px] text-[#8a2be2] font-bold uppercase tracking-[0.2em] leading-none mt-0.5">
+                Studio
+              </span>
+            </div>
           </div>
 
           <input 
