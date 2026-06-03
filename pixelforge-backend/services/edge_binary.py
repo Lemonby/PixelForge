@@ -7,15 +7,9 @@ def apply_threshold(image_b64: str, thresh_val: int) -> str:
     Apply Binary Thresholding on the image.
     Converts image to grayscale first, then maps pixel values to 0 or 255.
     """
-    img = decode_base64(image_b64)
-    if img is None:
+    gray = decode_base64(image_b64, cv2.IMREAD_GRAYSCALE)
+    if gray is None:
         return ""
-        
-    # Convert to grayscale if it is in color
-    if len(img.shape) == 3:
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    else:
-        gray = img
         
     _, thresh = cv2.threshold(gray, thresh_val, 255, cv2.THRESH_BINARY)
     return encode_base64(thresh)
@@ -25,15 +19,9 @@ def apply_edge_detection(image_b64: str, method: str, params: dict) -> str:
     Apply mathematical edge detection using selected method.
     Methods: canny, sobel, prewitt, robert, laplacian, log
     """
-    img = decode_base64(image_b64)
-    if img is None:
+    gray = decode_base64(image_b64, cv2.IMREAD_GRAYSCALE)
+    if gray is None:
         return ""
-        
-    # Convert to grayscale first
-    if len(img.shape) == 3:
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    else:
-        gray = img
         
     method = method.lower()
     

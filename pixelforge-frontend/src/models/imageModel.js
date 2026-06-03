@@ -7,19 +7,19 @@ export const useImageModel = create((set, get) => ({
   isProcessing: false,
   history: [],
   historyIndex: -1,
-  
+
   // Histogram and statistics data
   histogram: null,
   statistics: null,
   originalHistogram: null,
   originalStatistics: null,
-  
+
   // Adjustments yang belum disimpan (temporary)
   currentAdjustments: {
     brightness: 0,
     contrast: 0,
   },
-  
+
   setInitialImage: (base64) => set({
     baseOriginalImage: base64,
     originalImage: base64,
@@ -33,7 +33,7 @@ export const useImageModel = create((set, get) => ({
     originalHistogram: null,
     originalStatistics: null,
   }),
-  
+
   setHistogramData: (histogram, statistics) => set({
     histogram,
     statistics,
@@ -43,7 +43,7 @@ export const useImageModel = create((set, get) => ({
     originalHistogram: histogram,
     originalStatistics: statistics,
   }),
-  
+
   // Update adjustment value (brightness, contrast, dll)
   updateAdjustment: (key, value) => {
     set((state) => ({
@@ -53,12 +53,12 @@ export const useImageModel = create((set, get) => ({
       },
     }));
   },
-  
+
   // Apply current adjustments ke original image dan update currentImage
   setAdjustedImage: (base64) => {
     set({ currentImage: base64 });
   },
-  
+
   // Simpan state ke history (ketika export/download)
   saveState: () => {
     const { currentImage, history, historyIndex } = get();
@@ -73,7 +73,7 @@ export const useImageModel = create((set, get) => ({
       },
     });
   },
-  
+
   setResultImage: (base64) => {
     const { history, historyIndex } = get();
     const newHistory = history.slice(0, historyIndex + 1);
@@ -83,7 +83,7 @@ export const useImageModel = create((set, get) => ({
       historyIndex: newHistory.length,
     });
   },
-  
+
   stepBack: () => {
     const { historyIndex, history } = get();
     if (historyIndex > 0) {

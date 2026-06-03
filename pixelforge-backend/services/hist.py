@@ -38,16 +38,10 @@ def calculate_grayscale_histogram(image_b64: str, bins: int = 256):
     Calculate histogram untuk grayscale image.
     Returns histogram data dan normalized version
     """
-    img = decode_base64(image_b64)
+    gray = decode_base64(image_b64, cv2.IMREAD_GRAYSCALE)
     
-    if img is None:
+    if gray is None:
         return None
-    
-    # Convert ke grayscale jika belum
-    if len(img.shape) == 3:
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    else:
-        gray = img
     
     # Hitung histogram
     hist = cv2.calcHist([gray], [0], None, [bins], [0, 256])
