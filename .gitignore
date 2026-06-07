@@ -1,0 +1,28 @@
+# Python Cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.ipynb_checkpoints/
+
+# Virtual environments
+venv/
+.venv/
+env/
+.env
+
+# Node modules (jika ada di root)
+node_modules/
+
+# Dataset Besar (Abaikan folder train & validation, sisakan folder Examples untuk demo testing)
+pixelforge-backend/Dataset_Bentuk_Tangan/train/
+pixelforge-backend/Dataset_Bentuk_Tangan/validation/
+
+# Model Weights Besar (Ukuran 96MB mendekati batas 100MB GitHub)
+pixelforge-backend/models/*.weights.h5
+
+# OS & IDE files
+.DS_Store
+.vscode/
+.idea/
+*.swp

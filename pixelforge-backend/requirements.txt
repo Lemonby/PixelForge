@@ -6,3 +6,5 @@ Pillow
 numpy
 scipy
 matplotlib
+tensorflow-cpu
+keras

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import SliderControl from "./SliderControl";
-import { 
-  Sparkles, 
-  Move, 
-  RotateCw, 
+import {
+  Sparkles,
+  Move,
+  RotateCw,
   Image as ImageIcon,
   Sliders,
   ChevronDown,
@@ -15,14 +15,20 @@ import {
   Binary,
   Palette,
   Scissors,
-  Download
+  Download,
+  Cpu
 } from "lucide-react";
 import { useEditorController } from "../../controllers/editorController";
 import SegmentPanel from "./SegmentPanel";
 import CompressPanel from "./CompressPanel";
+import CnnPanel from "./CnnPanel";
 
 const FilterPanel = () => {
+
+  // controller
   const { currentImage, isProcessing, applyProcess, applyAdjustment, currentAdjustments } = useEditorController();
+
+  // state panel accordion
   const [isEnhanceOpen, setIsEnhanceOpen] = useState(true);
   const [isTransformOpen, setIsTransformOpen] = useState(true);
   const [isRestorationOpen, setIsRestorationOpen] = useState(true);
@@ -30,6 +36,7 @@ const FilterPanel = () => {
   const [isColorOpen, setIsColorOpen] = useState(true);
   const [isSegmentOpen, setIsSegmentOpen] = useState(false);
   const [isCompressOpen, setIsCompressOpen] = useState(false);
+  const [isCnnOpen, setIsCnnOpen] = useState(false);
 
   // Geometric state variables
   const [interpolation, setInterpolation] = useState("bilinear");
@@ -38,7 +45,7 @@ const FilterPanel = () => {
   const [ty, setTy] = useState(50);
   const [resizeWidth, setResizeWidth] = useState(800);
   const [resizeHeight, setResizeHeight] = useState(600);
-  
+
   // Crop state variables
   const [cropX, setCropX] = useState(50);
   const [cropY, setCropY] = useState(50);
@@ -104,10 +111,10 @@ const FilterPanel = () => {
 
       {/* Accordion Panels */}
       <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-4 ps-scrollbar">
-        
+
         {/* Section 1: Enhancements (Brightness, Contrast, etc.) */}
         <div className="border border-[#1a1a1a] rounded bg-[#202020]">
-          <button 
+          <button
             onClick={() => setIsEnhanceOpen(!isEnhanceOpen)}
             className="w-full flex items-center justify-between px-2.5 py-1.5 bg-[#2c2c2c] hover:bg-[#323232] border-b border-[#1a1a1a] text-[10px] font-bold uppercase tracking-wider text-[#cccccc]"
           >
@@ -136,7 +143,7 @@ const FilterPanel = () => {
                 defaultValue={currentAdjustments.contrast}
                 onChange={(val) => applyAdjustment("contrast", val)}
               />
-              
+
               <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[#2c2c2c]">
                 <button
                   onClick={() => applyProcess("/api/enhancement/histogram-eq")}
@@ -166,7 +173,7 @@ const FilterPanel = () => {
 
         {/* Section 2: Geometric Transforms */}
         <div className="border border-[#1a1a1a] rounded bg-[#202020]">
-          <button 
+          <button
             onClick={() => setIsTransformOpen(!isTransformOpen)}
             className="w-full flex items-center justify-between px-2.5 py-1.5 bg-[#2c2c2c] hover:bg-[#323232] border-b border-[#1a1a1a] text-[10px] font-bold uppercase tracking-wider text-[#cccccc]"
           >
@@ -179,7 +186,7 @@ const FilterPanel = () => {
 
           {isTransformOpen && (
             <div className="p-3 space-y-3">
-              
+
               {/* Interpolation Selector */}
               <div className="flex items-center justify-between border-b border-[#2c2c2c] pb-2 text-[10px]">
                 <span className="text-[#8e8e8e]">Interpolation:</span>
@@ -380,7 +387,7 @@ const FilterPanel = () => {
 
         {/* Section 3: Image Restoration (Noise Reduction) */}
         <div className="border border-[#1a1a1a] rounded bg-[#202020]">
-          <button 
+          <button
             onClick={() => setIsRestorationOpen(!isRestorationOpen)}
             className="w-full flex items-center justify-between px-2.5 py-1.5 bg-[#2c2c2c] hover:bg-[#323232] border-b border-[#1a1a1a] text-[10px] font-bold uppercase tracking-wider text-[#cccccc]"
           >
@@ -393,7 +400,7 @@ const FilterPanel = () => {
 
           {isRestorationOpen && (
             <div className="p-3 space-y-4">
-              
+
               {/* 1. Gaussian Blur (Spatial Filtering) */}
               <div className="space-y-1.5">
                 <div className="flex justify-between items-center text-[10px]">
@@ -484,7 +491,7 @@ const FilterPanel = () => {
 
         {/* Section 4: Binary & Edge Processing */}
         <div className="border border-[#1a1a1a] rounded bg-[#202020]">
-          <button 
+          <button
             onClick={() => setIsEdgeOpen(!isEdgeOpen)}
             className="w-full flex items-center justify-between px-2.5 py-1.5 bg-[#2c2c2c] hover:bg-[#323232] border-b border-[#1a1a1a] text-[10px] font-bold uppercase tracking-wider text-[#cccccc]"
           >
@@ -497,7 +504,7 @@ const FilterPanel = () => {
 
           {isEdgeOpen && (
             <div className="p-3 space-y-4">
-              
+
               {/* Category Selector (Master Dropdown) */}
               <div className="flex items-center justify-between border-b border-[#2c2c2c] pb-2.5 text-[10px]">
                 <span className="text-[#8e8e8e] font-semibold uppercase">Category:</span>
@@ -513,14 +520,14 @@ const FilterPanel = () => {
               </div>
 
               {/* Contextual Options */}
-              
+
               {/* 1. Thresholding Category */}
               {edgeCategory === "threshold" && (
                 <div className="space-y-4">
                   <p className="text-[9px] text-[#8e8e8e] leading-relaxed">
                     Converts the image to a binary (black-and-white) representation using a threshold limit.
                   </p>
-                  
+
                   <SliderControl
                     label="Threshold Limit"
                     min={0}
@@ -532,7 +539,7 @@ const FilterPanel = () => {
                       applyProcess("/api/edge/threshold", { threshold: val });
                     }}
                   />
-                  
+
                   <button
                     onClick={() => applyProcess("/api/edge/threshold", { threshold: thresholdVal })}
                     className="ps-button-primary w-full py-1 text-[10px]"
@@ -575,7 +582,7 @@ const FilterPanel = () => {
                       <span className="text-[9px] text-white font-semibold uppercase tracking-wider block border-b border-[#2c2c2c] pb-1 mb-1">
                         Canny Sensitivity Limits
                       </span>
-                      
+
                       <SliderControl
                         label="Low Threshold"
                         min={0}
@@ -680,7 +687,7 @@ const FilterPanel = () => {
 
         {/* Section 5: Color Processing */}
         <div className="border border-[#1a1a1a] rounded bg-[#202020]">
-          <button 
+          <button
             onClick={() => setIsColorOpen(!isColorOpen)}
             className="w-full flex items-center justify-between px-2.5 py-1.5 bg-[#2c2c2c] hover:bg-[#323232] border-b border-[#1a1a1a] text-[10px] font-bold uppercase tracking-wider text-[#cccccc]"
           >
@@ -693,7 +700,7 @@ const FilterPanel = () => {
 
           {isColorOpen && (
             <div className="p-3 space-y-4">
-              
+
               {/* Category Selector (Master Dropdown) */}
               <div className="flex items-center justify-between border-b border-[#2c2c2c] pb-2.5 text-[10px]">
                 <span className="text-[#8e8e8e] font-semibold uppercase">Category:</span>
@@ -709,14 +716,14 @@ const FilterPanel = () => {
               </div>
 
               {/* Contextual Options */}
-              
+
               {/* 1. Grayscale Conversion Category */}
               {colorCategory === "grayscale" && (
                 <div className="space-y-3">
                   <p className="text-[9px] text-[#8e8e8e] leading-relaxed">
                     Converts the RGB color image to a single-channel grayscale representation using weighted color luma formulas.
                   </p>
-                  
+
                   <div className="flex items-center justify-between border-b border-[#2c2c2c]/40 pb-2 text-[10px]">
                     <span className="text-[#8e8e8e]">Weight Model:</span>
                     <select
@@ -730,7 +737,7 @@ const FilterPanel = () => {
                       <option value="desaturation">Desaturation (Min-Max Average)</option>
                     </select>
                   </div>
-                  
+
                   <button
                     onClick={() => applyProcess("/api/color/grayscale", { method: grayMethod })}
                     className="ps-button-primary w-full py-1.5 text-[10px] font-semibold text-center mt-1"
@@ -837,9 +844,29 @@ const FilterPanel = () => {
           )}
         </div>
 
-        {/* Section 6: Image Segmentation */}
+        {/* Section 6: CNN Hand Gesture Recognition */}
         <div className="border border-[#1a1a1a] rounded bg-[#202020]">
-          <button 
+          <button
+            onClick={() => setIsCnnOpen(!isCnnOpen)}
+            className="w-full flex items-center justify-between px-2.5 py-1.5 bg-[#2c2c2c] hover:bg-[#323232] border-b border-[#1a1a1a] text-[10px] font-bold uppercase tracking-wider text-[#cccccc]"
+          >
+            <div className="flex items-center gap-1.5">
+              <Cpu size={11} className="text-[#007acc]" />
+              <span>CNN Hand Gesture Recognition</span>
+            </div>
+            {isCnnOpen ? <ChevronDown size={11} /> : <ChevronRight size={11} />}
+          </button>
+
+          {isCnnOpen && (
+            <div className="p-3">
+              <CnnPanel />
+            </div>
+          )}
+        </div>
+
+        {/* Section 7: Image Segmentation */}
+        <div className="border border-[#1a1a1a] rounded bg-[#202020]">
+          <button
             onClick={() => setIsSegmentOpen(!isSegmentOpen)}
             className="w-full flex items-center justify-between px-2.5 py-1.5 bg-[#2c2c2c] hover:bg-[#323232] border-b border-[#1a1a1a] text-[10px] font-bold uppercase tracking-wider text-[#cccccc]"
           >
@@ -851,15 +878,15 @@ const FilterPanel = () => {
           </button>
 
           {isSegmentOpen && (
-            <div className="p-3 border-t border-[#1a1a1a]">
+            <div className="p-3">
               <SegmentPanel />
             </div>
           )}
         </div>
 
-        {/* Section 7: Image Compression */}
+        {/* Section 8: Image Compression */}
         <div className="border border-[#1a1a1a] rounded bg-[#202020]">
-          <button 
+          <button
             onClick={() => setIsCompressOpen(!isCompressOpen)}
             className="w-full flex items-center justify-between px-2.5 py-1.5 bg-[#2c2c2c] hover:bg-[#323232] border-b border-[#1a1a1a] text-[10px] font-bold uppercase tracking-wider text-[#cccccc]"
           >
@@ -871,7 +898,7 @@ const FilterPanel = () => {
           </button>
 
           {isCompressOpen && (
-            <div className="p-3 border-t border-[#1a1a1a]">
+            <div className="p-3">
               <CompressPanel />
             </div>
           )}

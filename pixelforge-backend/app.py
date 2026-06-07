@@ -9,6 +9,7 @@ from routes.edge_routes import edge_bp
 from routes.color_routes import color_bp
 from routes.segment_routes import segment_bp
 from routes.compress_routes import compress_bp
+from routes.cnn_routes import cnn_bp
 
 def create_app():
     app = Flask(__name__)
@@ -23,6 +24,7 @@ def create_app():
     app.register_blueprint(color_bp, url_prefix='/api/color')
     app.register_blueprint(segment_bp, url_prefix='/api/segment')
     app.register_blueprint(compress_bp, url_prefix='/api/compress')
+    app.register_blueprint(cnn_bp, url_prefix='/api/cnn')
 
     @app.route('/')
     def index():
@@ -34,3 +36,4 @@ def create_app():
 if __name__ == '__main__':
     app = create_app()
     app.run(debug=True, port=5000)
+
